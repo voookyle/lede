@@ -49,7 +49,46 @@ jobs:
           ./scripts/feeds install -a
 
       - name: Generate configuration file
-        run: make defconfig
+        run: |
+          rm -f ./.config*
+          touch ./.config
+          cat >> .config <<EOF
+          #
+          # ========================固件定制部分========================
+          #
+          CONFIG_TARGET_x86=y
+          CONFIG_TARGET_x86_64=y
+          CONFIG_TARGET_x86_64_DEVICE_generic=y
+          CONFIG_IB=y
+          CONFIG_IB_STANDALONE=y
+          CONFIG_IMAGEOPT=y
+          CONFIG_PACKAGE_firewall=m
+          CONFIG_PACKAGE_firewall4=y
+          CONFIG_PACKAGE_iptables-mod-conntrack-extra=m
+          CONFIG_PACKAGE_iptables-mod-fullconenat=m
+          CONFIG_PACKAGE_jansson=y
+          CONFIG_PACKAGE_kmod-ipt-conntrack=m
+          CONFIG_PACKAGE_kmod-ipt-conntrack-extra=m
+          CONFIG_PACKAGE_kmod-ipt-fullconenat=m
+          CONFIG_PACKAGE_kmod-nf-log6=y
+          CONFIG_PACKAGE_kmod-nf-reject6=y
+          CONFIG_PACKAGE_kmod-nft-core=y
+          CONFIG_PACKAGE_kmod-nft-fib=y
+          CONFIG_PACKAGE_kmod-nft-nat=y
+          CONFIG_PACKAGE_kmod-nft-offload=y
+          CONFIG_PACKAGE_libnftnl=y
+          CONFIG_PACKAGE_nftables-json=y
+          CONFIG_TARGET_EXT4_BLOCKSIZE=4096
+          CONFIG_TARGET_EXT4_BLOCKSIZE_4K=y
+          CONFIG_TARGET_EXT4_RESERVED_PCT=0
+          CONFIG_TARGET_ROOTFS_EXT4FS=y
+
+          #
+          # ========================固件定制部分结束========================
+          #
+          EOF
+          sed -i 's/^[ \t]*//g' ./.config
+          make defconfig
 
       - name: Download packages
         run: make download -j16
